@@ -2,9 +2,16 @@
 
 source $(cd $(dirname $0); pwd)/lib.sh
 
-if [ $# -ne 1 ]; then
-    echo Usage: $0 STASH_URL
+if [ $# -lt 1 -o $# -gt 2 ]; then
+    echo Usage: $0 [-i] STASH_URL
     exit 1
+fi
+
+if [ "$1" == "-i" ]; then
+    shift
+    interactive=yes
+else
+    interactive=
 fi
 
 s_base_url="$1"
@@ -39,8 +46,19 @@ for project in "${projects[@]}"; do
         sed 's/}},{/\n/g' |
         sed -r 's/.*"slug":"([^"]+)".*/\1/'))
     for repo in "${repos[@]}"; do
-        printf '%10sremoving repo %-15s\n' ' ' $repo
-        delete "$s_api_url/projects/$project/repos/$repo" "$s_auth" >> $log
+        if [ "$interactive" ]; then
+            prompt=$(printf '%10sremove repo %-15s? (y/n) ' ' ' $repo)
+            yes=
+            while grep -vqi '[yn]' <<< "$yes"; do
+                read -p"$prompt" -ei n yes
+            done
+        else
+            yes="y"
+        fi
+        if [ "$yes" == "y" ]; then
+            printf '%10sremoving repo %-15s\n' ' ' $repo
+            delete "$s_api_url/projects/$project/repos/$repo" "$s_auth" >> $log
+        fi
     done
     delete "$s_api_url/projects/$project" "$s_auth" >> $log
 done

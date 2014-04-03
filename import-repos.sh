@@ -53,7 +53,7 @@ for repo in ${repos[@]}; do
     fi
 
     progress=$(printf '[%3d/%3d]' $i ${#repos[@]})
-    prompt=$(printf '%s {%s} link to (empty to skip): ' $progress $i ${#repos[@]} $repo)
+    prompt=$(printf '%s {%s} link to (empty to skip): ' "$progress" "$repo")
     if [ "$interactive" ]; then
         if [ -z "$proj_link" ]; then
             read -p"$prompt" proj_link

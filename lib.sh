@@ -23,6 +23,19 @@ get() {
         $url
 }
 
+put() {
+    local url="$1"
+    local auth="$2"
+    local data="$3"
+
+    curl -s \
+        -X PUT \
+        -H"Authorization: Basic $(echo -n "$auth" | base64 -w0)" \
+        -H"Content-Type: application/json; charset=utf-8" \
+        -d $data \
+        $url
+}
+
 delete() {
     local url="$1"
     local auth="$2"
